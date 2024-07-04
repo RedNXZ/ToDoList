@@ -17,6 +17,12 @@ public class TaskManager
         tasks.Add(new Task(nextId++, description));
     }
 
+    public void AddTask(int id, string description, bool isCompleted)
+    {
+        tasks.Add(new Task(id, description) { IsCompleted = isCompleted });
+        nextId = tasks.Max(t => t.Id) + 1;
+    }
+
     public void CompleteTask(int id)
     {
         var task = tasks.FirstOrDefault(t => t.Id == id);
@@ -32,6 +38,7 @@ public class TaskManager
         if (task != null)
         {
             tasks.Remove(task);
+            RenumberTasks();
         }
     }
 
@@ -47,5 +54,15 @@ public class TaskManager
     public List<Task> GetTasksByStatus(bool isCompleted)
     {
         return tasks.Where(t => t.IsCompleted == isCompleted).ToList();
+    }
+
+    private void RenumberTasks()
+    {
+        int newId = 1;
+        foreach (var task in tasks)
+        {
+            task.Id = newId++;
+        }
+        nextId = newId;
     }
 }

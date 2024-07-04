@@ -9,16 +9,19 @@ class Program
 
     static void Main(string[] args)
     {
-
         Console.OutputEncoding = Encoding.UTF8; // Поддержка кириллицы
         var tasks = fileHandler.LoadTasks();
         foreach (var task in tasks)
         {
-            taskManager.AddTask(task.Description);
+            taskManager.AddTask(task.Id, task.Description, task.IsCompleted);
         }
 
         while (true)
         {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("========== Список задач ==========");
+            Console.ResetColor();
             Console.WriteLine("\n1. Добавить задачу");
             Console.WriteLine("2. Просмотр задач");
             Console.WriteLine("3. Завершить задачу");
@@ -26,6 +29,7 @@ class Program
             Console.WriteLine("5. Фильтрация задач");
             Console.WriteLine("6. Сохранить и выйти");
             Console.WriteLine("7. Выйти без сохранения");
+            Console.WriteLine("==================================");
             Console.WriteLine("Выберите опцию:");
 
             var choice = Console.ReadLine();
@@ -53,9 +57,13 @@ class Program
                 case "7":
                     return;
                 default:
-                    Console.WriteLine("Неверная опция");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Неверная опция, попробуйте снова.");
+                    Console.ResetColor();
                     break;
             }
+            Console.WriteLine("Нажмите любую клавишу для продолжения...");
+            Console.ReadKey();
         }
     }
 
@@ -64,6 +72,9 @@ class Program
         Console.WriteLine("Введите описание задачи:");
         var description = Console.ReadLine();
         taskManager.AddTask(description);
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("Задача добавлена!");
+        Console.ResetColor();
     }
 
     private static void ViewTasks()
@@ -71,8 +82,14 @@ class Program
         Console.WriteLine("\nВсе задачи:");
         foreach (var task in taskManager.GetTasks())
         {
+            if (task.IsCompleted)
+                Console.ForegroundColor = ConsoleColor.Gray;
+            else
+                Console.ForegroundColor = ConsoleColor.White;
+
             Console.WriteLine(task);
         }
+        Console.ResetColor();
     }
 
     private static void CompleteTask()
@@ -81,11 +98,15 @@ class Program
         if (int.TryParse(Console.ReadLine(), out int id))
         {
             taskManager.CompleteTask(id);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Задача завершена!");
         }
         else
         {
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Неверный ID");
         }
+        Console.ResetColor();
     }
 
     private static void DeleteTask()
@@ -94,11 +115,15 @@ class Program
         if (int.TryParse(Console.ReadLine(), out int id))
         {
             taskManager.DeleteTask(id);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Задача удалена!");
         }
         else
         {
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Неверный ID");
         }
+        Console.ResetColor();
     }
 
     private static void FilterTasks()
@@ -123,6 +148,7 @@ class Program
                 tasks = taskManager.GetTasksByStatus(false);
                 break;
             default:
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Неверная опция");
                 return;
         }
@@ -137,6 +163,9 @@ class Program
     private static void SaveAndExit()
     {
         fileHandler.SaveTasks(taskManager.GetTasks());
+        Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("Задачи сохранены. Выход...");
+        Console.ResetColor();
     }
 }
+
